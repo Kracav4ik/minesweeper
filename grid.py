@@ -10,9 +10,9 @@ BOMB_COUNT = 30
 
 
 class Cell:
-    def __init__(self, is_open, is_bomb):
-        self.is_open = is_open
-        self.is_bomb = is_bomb
+    is_open = False
+    is_bomb = False
+    is_marked = False
 
 
 class Grid:
@@ -28,7 +28,7 @@ class Grid:
         for x in range(width):
             col = []
             for y in range(height):
-                col.append(Cell(False, False))
+                col.append(Cell())
                 coords.append([x, y])
             self.cells.append(col)
         for x, y in random.sample(coords, BOMB_COUNT):
@@ -57,6 +57,20 @@ class Grid:
                 count += 1
         return count
 
+    def flags_count(self, x, y):
+        count = 0
+        for xn, yn in self.neighbors(x, y):
+            celln = self.cells[xn][yn]
+            if celln.is_marked:
+                count += 1
+        return count
+
+    def pixels2grid(self, pos):
+        pix_x, pix_y = pos
+        x = pix_x // self.pix_w
+        y = pix_y // self.pix_h
+        return [x, y]
+
     def render(self, screen):
         for x in range(self.width):
             for y in range(self.height):
@@ -77,6 +91,11 @@ class Grid:
                         text_x = pix_x - 1 + self.pix_w // 2 - text_surface.get_width() // 2
                         text_y = pix_y - 1 + self.pix_h // 2 - text_surface.get_height() // 2
                         screen.blit(text_surface, (text_x, text_y))
+                if cell.is_marked:
+                    text_surface = self.font.render('*', False, (0, 0, 0))
+                    text_x = pix_x - 1 + self.pix_w // 2 - text_surface.get_width() // 2
+                    text_y = pix_y - 1 + self.pix_h // 2 - text_surface.get_height() // 2
+                    screen.blit(text_surface, (text_x, text_y))
 
         x, y = self.active_cell
         pix_x = x * self.pix_w
@@ -84,22 +103,30 @@ class Grid:
         pygame.draw.rect(screen, HOVER_COLOR, (pix_x, pix_y, self.pix_w, self.pix_h), 3)
 
     def cell_click(self, pos):
-        pix_x, pix_y = pos
-        x = pix_x // self.pix_w
-        y = pix_y // self.pix_h
+        x, y = self.pixels2grid(pos)
         self.open_cell(x, y)
 
     def open_cell(self, x, y):
         cell = self.cells[x][y]
         cell.is_open = True
         if not cell.is_bomb and self.bombs_count(x, y) == 0:
-            for xn, yn in self.neighbors(x, y):
-                celln = self.cells[xn][yn]
-                if not celln.is_open:
-                    self.open_cell(xn, yn)
+            self.open_neighbors(x, y)
+
+    def open_neighbors(self, x, y):
+        for xn, yn in self.neighbors(x, y):
+            celln = self.cells[xn][yn]
+            if not celln.is_open and not celln.is_marked:
+                self.open_cell(xn, yn)
 
     def cell_hover(self, pos):
-        pix_x, pix_y = pos
-        x = pix_x // self.pix_w
-        y = pix_y // self.pix_h
+        x, y = self.pixels2grid(pos)
         self.active_cell = (x, y)
+
+    def mark_cell(self, pos):
+        x, y = self.pixels2grid(pos)
+        cell = self.cells[x][y]
+        if cell.is_open:
+            if not cell.is_bomb and self.bombs_count(x, y) == self.flags_count(x, y):
+                self.open_neighbors(x, y)
+        else:
+            cell.is_marked = not cell.is_marked
