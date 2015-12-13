@@ -35,6 +35,7 @@ class Grid:
             cell = self.cells[x][y]
             cell.is_bomb = True
         self.font = pygame.font.SysFont('Arial', 70)
+        self.flag_font = pygame.font.SysFont('Arial', 30)
 
     def good_coords(self, x, y):
         return 0 <= x < self.width and 0 <= y < self.height
@@ -92,7 +93,7 @@ class Grid:
                         text_y = pix_y - 1 + self.pix_h // 2 - text_surface.get_height() // 2
                         screen.blit(text_surface, (text_x, text_y))
                 if cell.is_marked:
-                    text_surface = self.font.render('*', False, (0, 0, 0))
+                    text_surface = self.flag_font.render('|>', False, (0, 0, 0))
                     text_x = pix_x - 1 + self.pix_w // 2 - text_surface.get_width() // 2
                     text_y = pix_y - 1 + self.pix_h // 2 - text_surface.get_height() // 2
                     screen.blit(text_surface, (text_x, text_y))
@@ -108,6 +109,8 @@ class Grid:
 
     def open_cell(self, x, y):
         cell = self.cells[x][y]
+        if cell.is_marked:
+            return
         cell.is_open = True
         if not cell.is_bomb and self.bombs_count(x, y) == 0:
             self.open_neighbors(x, y)
@@ -115,7 +118,7 @@ class Grid:
     def open_neighbors(self, x, y):
         for xn, yn in self.neighbors(x, y):
             celln = self.cells[xn][yn]
-            if not celln.is_open and not celln.is_marked:
+            if not celln.is_open:
                 self.open_cell(xn, yn)
 
     def cell_hover(self, pos):
