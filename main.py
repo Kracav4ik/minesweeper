@@ -19,6 +19,9 @@ def handle_input():
     for event in events:
         if event.type == pygame.QUIT:
             sys.exit()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:  # left mouse button
+                grid.cell_click(event.pos)
 
 
 def process_game():
