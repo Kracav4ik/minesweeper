@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 from __future__ import division
 
 import pygame
@@ -5,16 +7,19 @@ import sys
 
 from grid import Grid
 
+# инициализация
 pygame.init()
 
-WINDOW_SIZE = (1280, 720)
-WINDOW_BG_COLOR = (128, 255, 255)
+WINDOW_SIZE = (1280, 720)  # размер окна в пикселах
+WINDOW_BG_COLOR = (128, 255, 255)  # цвет окна
 
 screen = pygame.display.set_mode(WINDOW_SIZE)
 grid = Grid(20, 10, WINDOW_SIZE)
 
 
 def handle_input():
+    """Обработка input от игрока
+    """
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT:
@@ -33,6 +38,8 @@ def process_game():
 
 
 def render():
+    """ Отрисовка игры на экране
+    """
     main_screen = pygame.display.get_surface()
     main_screen.fill(WINDOW_BG_COLOR)
 
@@ -41,7 +48,7 @@ def render():
     pygame.display.flip()
 
 
-# main game cycle
+# игровой цикл
 while True:
     handle_input()
     process_game()
