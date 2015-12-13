@@ -1,6 +1,10 @@
 from __future__ import division
 import pygame
 
+bomb_color = (192, 0, 0)
+empty_color = (0, 192, 0)
+unknown_color = (130, 60, 130)
+
 
 class Cell:
     def __init__(self, is_open, is_bomb):
@@ -28,4 +32,10 @@ class Grid:
                 cell = self.cells[x][y]
                 left = x * self.pix_w + 1
                 top = y * self.pix_h + 1
-                pygame.draw.rect(screen, (192, 0, 0), (left, top, self.pix_w - 2, self.pix_h - 2))
+                if not cell.is_open:
+                    color = unknown_color
+                elif cell.is_bomb:
+                    color = bomb_color
+                else:
+                    color = empty_color
+                pygame.draw.rect(screen, color, (left, top, self.pix_w - 2, self.pix_h - 2))
