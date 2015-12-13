@@ -7,11 +7,11 @@ from grid import Grid
 
 pygame.init()
 
-window_size = (1280, 720)
-window_bg = (128, 255, 255)
+WINDOW_SIZE = (1280, 720)
+WINDOW_BG_COLOR = (128, 255, 255)
 
-screen = pygame.display.set_mode(window_size)
-grid = Grid(20, 10, window_size)
+screen = pygame.display.set_mode(WINDOW_SIZE)
+grid = Grid(20, 10, WINDOW_SIZE)
 
 
 def handle_input():
@@ -32,7 +32,7 @@ def process_game():
 
 def render():
     main_screen = pygame.display.get_surface()
-    main_screen.fill(window_bg)
+    main_screen.fill(WINDOW_BG_COLOR)
 
     grid.render(screen)
 

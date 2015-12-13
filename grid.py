@@ -2,11 +2,11 @@ from __future__ import division
 import random
 import pygame
 
-bomb_color = (192, 0, 0)
-empty_color = (0, 192, 0)
-unknown_color = (130, 60, 130)
-hover_color = (255, 255, 255)
-bomb_count = 30
+BOMB_COLOR = (192, 0, 0)
+EMPTY_COLOR = (0, 192, 0)
+UNKNOWN_COLOR = (130, 60, 130)
+HOVER_COLOR = (255, 255, 255)
+BOMB_COUNT = 30
 
 
 class Cell:
@@ -31,7 +31,7 @@ class Grid:
                 col.append(Cell(False, False))
                 coords.append([x, y])
             self.cells.append(col)
-        for x, y in random.sample(coords, bomb_count):
+        for x, y in random.sample(coords, BOMB_COUNT):
             cell = self.cells[x][y]
             cell.is_bomb = True
         self.font = pygame.font.SysFont('Arial', 70)
@@ -49,6 +49,14 @@ class Grid:
                     result.append([xn, yn])
         return result
 
+    def bombs_count(self, x, y):
+        count = 0
+        for xn, yn in self.neighbors(x, y):
+            celln = self.cells[xn][yn]
+            if celln.is_bomb:
+                count += 1
+        return count
+
     def render(self, screen):
         for x in range(self.width):
             for y in range(self.height):
@@ -56,18 +64,14 @@ class Grid:
                 pix_x = x * self.pix_w + 1
                 pix_y = y * self.pix_h + 1
                 if not cell.is_open:
-                    color = unknown_color
+                    color = UNKNOWN_COLOR
                 elif cell.is_bomb:
-                    color = bomb_color
+                    color = BOMB_COLOR
                 else:
-                    color = empty_color
+                    color = EMPTY_COLOR
                 pygame.draw.rect(screen, color, (pix_x, pix_y, self.pix_w - 2, self.pix_h - 2))
                 if cell.is_open and not cell.is_bomb:
-                    bombs_count = 0
-                    for xn, yn in self.neighbors(x, y):
-                        celln = self.cells[xn][yn]
-                        if celln.is_bomb:
-                            bombs_count += 1
+                    bombs_count = self.bombs_count(x, y)
                     if bombs_count > 0:
                         text_surface = self.font.render(str(bombs_count), False, (0, 0, 0))
                         text_x = pix_x - 1 + self.pix_w // 2 - text_surface.get_width() // 2
@@ -77,7 +81,7 @@ class Grid:
         x, y = self.active_cell
         pix_x = x * self.pix_w
         pix_y = y * self.pix_h
-        pygame.draw.rect(screen, hover_color, (pix_x, pix_y, self.pix_w, self.pix_h), 3)
+        pygame.draw.rect(screen, HOVER_COLOR, (pix_x, pix_y, self.pix_w, self.pix_h), 3)
 
     def cell_click(self, pos):
         pix_x, pix_y = pos
