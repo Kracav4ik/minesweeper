@@ -87,8 +87,16 @@ class Grid:
         pix_x, pix_y = pos
         x = pix_x // self.pix_w
         y = pix_y // self.pix_h
+        self.open_cell(x, y)
+
+    def open_cell(self, x, y):
         cell = self.cells[x][y]
         cell.is_open = True
+        if not cell.is_bomb and self.bombs_count(x, y) == 0:
+            for xn, yn in self.neighbors(x, y):
+                celln = self.cells[xn][yn]
+                if not celln.is_open:
+                    self.open_cell(xn, yn)
 
     def cell_hover(self, pos):
         pix_x, pix_y = pos
