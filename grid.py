@@ -33,12 +33,12 @@ class Grid:
     font - Шрифт цифр внутри клетки
     flag_font - Шрифт флажка внутри клетки
     """
-    def __init__(self, width, height, window_size):
+    def __init__(self, width, height, screen_size):
         self.width = width
         self.height = height
-        window_w, window_h = window_size
-        self.pix_w = window_w // width
-        self.pix_h = window_h // height
+        screen_w, screen_h = screen_size
+        self.pix_w = screen_w // width
+        self.pix_h = screen_h // height
         self.cells = []
         self.active_cell = (0, 0)
 
@@ -96,7 +96,7 @@ class Grid:
                 count += 1
         return count
 
-    def pixels2grid(self, pos):
+    def pixels_to_grid(self, pos):
         """Возвращает коор-ты в клетках из переданных коор-т в пикселах
         """
         pix_x, pix_y = pos
@@ -123,34 +123,30 @@ class Grid:
                     color = EMPTY_COLOR
 
                 # Рисуем клетку нужнем цветом
-                pygame.draw.rect(screen, color, (pix_x, pix_y, self.pix_w - 2, self.pix_h - 2))
+                screen.draw_rect(color, pix_x, pix_y, self.pix_w - 2, self.pix_h - 2)
 
                 # Смотрим кол-во бомб и рисуем цифру кол-во бомб поверх клетки
                 if cell.is_open and not cell.is_bomb:
                     bombs_count = self.bombs_count(x, y)
                     if bombs_count > 0:
-                        text_surface = self.font.render(str(bombs_count), False, (0, 0, 0))
-                        text_x = pix_x - 1 + self.pix_w // 2 - text_surface.get_width() // 2
-                        text_y = pix_y - 1 + self.pix_h // 2 - text_surface.get_height() // 2
-                        screen.blit(text_surface, (text_x, text_y))
+                        screen.draw_text(str(bombs_count), self.font, (0, 0, 0), pix_x, pix_y, self.pix_w - 2, self.pix_h - 2)
 
                 # Рисуем флажок поверх помеченой клетке
                 if cell.is_marked:
-                    text_surface = self.flag_font.render('|>', False, (0, 0, 0))
-                    text_x = pix_x - 1 + self.pix_w // 2 - text_surface.get_width() // 2
-                    text_y = pix_y - 1 + self.pix_h // 2 - text_surface.get_height() // 2
-                    screen.blit(text_surface, (text_x, text_y))
+                    screen.draw_text('|>', self.flag_font, (0, 0, 0), pix_x, pix_y, self.pix_w - 2, self.pix_h - 2)
 
         # Рисуем рамку поверх активной ячейки
         x, y = self.active_cell
         pix_x = x * self.pix_w
         pix_y = y * self.pix_h
-        pygame.draw.rect(screen, HOVER_COLOR, (pix_x, pix_y, self.pix_w, self.pix_h), 3)
+        screen.draw_frame(HOVER_COLOR, pix_x, pix_y, self.pix_w, self.pix_h, 3)
 
     def cell_click(self, pos):
         """Открывает клетку по которой нажали левой кнопкой мыши
         """
-        x, y = self.pixels2grid(pos)
+        x, y = self.pixels_to_grid(pos)
+        if not self.good_coords(x, y):
+            return
         self.open_cell(x, y)
 
     def open_cell(self, x, y):
@@ -175,14 +171,18 @@ class Grid:
     def cell_hover(self, pos):
         """Активирует клетку, на которую наведён курсор мыши
         """
-        x, y = self.pixels2grid(pos)
+        x, y = self.pixels_to_grid(pos)
+        if not self.good_coords(x, y):
+            return
         self.active_cell = (x, y)
 
     def mark_cell(self, pos):
         """Ставит / снимает флажок на закрытые клетки,
         для открытых клеток открывает соседние если кол-во флажков соот-ет кол-ву бомб рядом с клеткой
         """
-        x, y = self.pixels2grid(pos)
+        x, y = self.pixels_to_grid(pos)
+        if not self.good_coords(x, y):
+            return
         cell = self.cells[x][y]
         if cell.is_open:
             if not cell.is_bomb and self.bombs_count(x, y) == self.flags_count(x, y):

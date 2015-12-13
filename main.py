@@ -6,6 +6,7 @@ import pygame
 import sys
 
 from grid import Grid
+from screen import Screen
 
 # инициализация
 pygame.init()
@@ -13,8 +14,9 @@ pygame.init()
 WINDOW_SIZE = (1280, 720)  # размер окна в пикселах
 WINDOW_BG_COLOR = (128, 255, 255)  # цвет окна
 
-screen = pygame.display.set_mode(WINDOW_SIZE)
-grid = Grid(20, 10, WINDOW_SIZE)
+window_surface = pygame.display.set_mode(WINDOW_SIZE)
+screen = Screen(window_surface)
+grid = Grid(20, 10, screen.get_size())
 
 
 def handle_input():
@@ -25,12 +27,14 @@ def handle_input():
         if event.type == pygame.QUIT:
             sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            pos = screen.convert_to_local(event.pos)
             if event.button == 1:  # left mouse button
-                grid.cell_click(event.pos)
+                grid.cell_click(pos)
             else:
-                grid.mark_cell(event.pos)
+                grid.mark_cell(pos)
         elif event.type == pygame.MOUSEMOTION:
-            grid.cell_hover(event.pos)
+            pos = screen.convert_to_local(event.pos)
+            grid.cell_hover(pos)
 
 
 def process_game():
