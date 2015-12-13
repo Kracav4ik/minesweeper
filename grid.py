@@ -4,6 +4,7 @@ import pygame
 bomb_color = (192, 0, 0)
 empty_color = (0, 192, 0)
 unknown_color = (130, 60, 130)
+hover_color = (255, 255, 255)
 
 
 class Cell:
@@ -20,6 +21,7 @@ class Grid:
         self.pix_w = window_w // width
         self.pix_h = window_h // height
         self.cells = []
+        self.active_cell = (0, 0)
         for x in range(width):
             col = []
             for y in range(height):
@@ -40,9 +42,20 @@ class Grid:
                     color = empty_color
                 pygame.draw.rect(screen, color, (pix_x, pix_y, self.pix_w - 2, self.pix_h - 2))
 
+        x, y = self.active_cell
+        pix_x = x * self.pix_w
+        pix_y = y * self.pix_h
+        pygame.draw.rect(screen, hover_color, (pix_x, pix_y, self.pix_w, self.pix_h), 3)
+
     def cell_click(self, pos):
         pix_x, pix_y = pos
         x = pix_x // self.pix_w
         y = pix_y // self.pix_h
         cell = self.cells[x][y]
         cell.is_open = True
+
+    def cell_hover(self, pos):
+        pix_x, pix_y = pos
+        x = pix_x // self.pix_w
+        y = pix_y // self.pix_h
+        self.active_cell = (x, y)
