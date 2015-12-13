@@ -36,6 +36,19 @@ class Grid:
             cell.is_bomb = True
         self.font = pygame.font.SysFont('Arial', 70)
 
+    def good_coords(self, x, y):
+        return 0 <= x < self.width and 0 <= y < self.height
+
+    def neighbors(self, x, y):
+        result = []
+        for xn in range(x - 1, x + 2):
+            for yn in range(y - 1, y + 2):
+                if xn == x and yn == y:
+                    continue
+                if self.good_coords(xn, yn):
+                    result.append([xn, yn])
+        return result
+
     def render(self, screen):
         for x in range(self.width):
             for y in range(self.height):
@@ -49,11 +62,17 @@ class Grid:
                 else:
                     color = empty_color
                 pygame.draw.rect(screen, color, (pix_x, pix_y, self.pix_w - 2, self.pix_h - 2))
-                if cell.is_open:
-                    text_surface = self.font.render('0', False, (0, 0, 0))
-                    text_x = pix_x - 1 + self.pix_w // 2 - text_surface.get_width() // 2
-                    text_y = pix_y - 1 + self.pix_h // 2 - text_surface.get_height() // 2
-                    screen.blit(text_surface, (text_x, text_y))
+                if cell.is_open and not cell.is_bomb:
+                    bombs_count = 0
+                    for xn, yn in self.neighbors(x, y):
+                        celln = self.cells[xn][yn]
+                        if celln.is_bomb:
+                            bombs_count += 1
+                    if bombs_count > 0:
+                        text_surface = self.font.render(str(bombs_count), False, (0, 0, 0))
+                        text_x = pix_x - 1 + self.pix_w // 2 - text_surface.get_width() // 2
+                        text_y = pix_y - 1 + self.pix_h // 2 - text_surface.get_height() // 2
+                        screen.blit(text_surface, (text_x, text_y))
 
         x, y = self.active_cell
         pix_x = x * self.pix_w
