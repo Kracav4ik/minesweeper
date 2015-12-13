@@ -3,6 +3,7 @@ from __future__ import division
 import pygame
 import sys
 
+from grid import Grid
 
 pygame.init()
 
@@ -10,6 +11,7 @@ window_size = (1280, 720)
 window_bg = (128, 255, 255)
 
 screen = pygame.display.set_mode(window_size)
+grid = Grid(20, 10)
 
 
 def handle_input():
@@ -26,6 +28,9 @@ def process_game():
 def render():
     main_screen = pygame.display.get_surface()
     main_screen.fill(window_bg)
+
+    grid.render(screen)
+
     pygame.display.flip()
 
 
