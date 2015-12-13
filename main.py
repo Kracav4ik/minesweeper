@@ -11,7 +11,7 @@ window_size = (1280, 720)
 window_bg = (128, 255, 255)
 
 screen = pygame.display.set_mode(window_size)
-grid = Grid(20, 10)
+grid = Grid(20, 10, window_size)
 
 
 def handle_input():
