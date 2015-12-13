@@ -34,6 +34,7 @@ class Grid:
         for x, y in random.sample(coords, bomb_count):
             cell = self.cells[x][y]
             cell.is_bomb = True
+        self.font = pygame.font.SysFont('Arial', 70)
 
     def render(self, screen):
         for x in range(self.width):
@@ -48,6 +49,11 @@ class Grid:
                 else:
                     color = empty_color
                 pygame.draw.rect(screen, color, (pix_x, pix_y, self.pix_w - 2, self.pix_h - 2))
+                if cell.is_open:
+                    text_surface = self.font.render('0', False, (0, 0, 0))
+                    text_x = pix_x - 1 + self.pix_w // 2 - text_surface.get_width() // 2
+                    text_y = pix_y - 1 + self.pix_h // 2 - text_surface.get_height() // 2
+                    screen.blit(text_surface, (text_x, text_y))
 
         x, y = self.active_cell
         pix_x = x * self.pix_w
