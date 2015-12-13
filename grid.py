@@ -1,10 +1,12 @@
 from __future__ import division
+import random
 import pygame
 
 bomb_color = (192, 0, 0)
 empty_color = (0, 192, 0)
 unknown_color = (130, 60, 130)
 hover_color = (255, 255, 255)
+bomb_count = 30
 
 
 class Cell:
@@ -22,11 +24,16 @@ class Grid:
         self.pix_h = window_h // height
         self.cells = []
         self.active_cell = (0, 0)
+        coords = []
         for x in range(width):
             col = []
             for y in range(height):
                 col.append(Cell(False, False))
+                coords.append([x, y])
             self.cells.append(col)
+        for x, y in random.sample(coords, bomb_count):
+            cell = self.cells[x][y]
+            cell.is_bomb = True
 
     def render(self, screen):
         for x in range(self.width):
