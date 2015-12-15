@@ -49,3 +49,14 @@ class Screen:
         thickness - Толщина рамки в пикселях
         """
         pygame.draw.rect(self.surface, color, (pix_x, pix_y, pix_w, pix_h), thickness)
+
+    def draw_texture(self, texture, pix_x, pix_y, pix_w, pix_h):
+        """Рисуем текстуру так, чтобы ее центр был в центре заданного прямоугольника
+        texture - текстура в виде объекта pygame.Surface
+        pix_x, pix_y - координаты левого верхнего угла прямоугольника в пикселях
+        pix_w - Ширина прямоугольника в пикселях
+        pix_h - Высота прямоугольника в пикселях
+        """
+        tex_x = pix_x + pix_w // 2 - texture.get_width() // 2
+        tex_y = pix_y + pix_h // 2 - texture.get_height() // 2
+        self.surface.blit(texture, (tex_x, tex_y))

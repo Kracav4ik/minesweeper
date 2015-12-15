@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 from __future__ import division
+import os.path
 import random
 import pygame
 
@@ -34,7 +35,7 @@ class Grid:
     cells - 2-мерная матрица с ячейками; ячейка с координатоми x, y получается как self.cells[x][y]
     active_cell - Коор-ты активной ячейки т.е. коор-ты ячейки где находится курсор мыши
     font - Шрифт цифр внутри клетки
-    flag_font - Шрифт флажка внутри клетки
+    flag_texture - Текстура с флагом
     """
     def __init__(self, width, height, screen_x, screen_y, screen_width, screen_height):
         self.width = width
@@ -63,7 +64,7 @@ class Grid:
             cell.is_bomb = True
 
         self.font = pygame.font.SysFont('Arial', 70)
-        self.flag_font = pygame.font.SysFont('Arial', 30)
+        self.flag_texture = pygame.image.load(os.path.join('data', 'flag.png'))
 
     def good_coords(self, x, y):
         """Возвращает True, если коор-ты х, у которые пренадлежат ячейкам
@@ -142,7 +143,7 @@ class Grid:
 
                 # Рисуем флажок поверх помеченой клетке
                 if cell.is_marked:
-                    screen.draw_text('|>', self.flag_font, (0, 0, 0), pix_x, pix_y, self.pix_w - 2, self.pix_h - 2)
+                    screen.draw_texture(self.flag_texture, pix_x, pix_y, self.pix_w - 2, self.pix_h - 2)
 
         # Рисуем рамку поверх активной ячейки
         x, y = self.active_cell
