@@ -19,7 +19,7 @@ window_surface = pygame.display.set_mode(WINDOW_SIZE)
 screen = Screen(window_surface)
 grid = Grid(20, 10, 40, 90, 1200, 600)
 
-button = Button(10, 5, 200, 50, sys.exit)
+button = Button(10, 5, 200, 50, 'Exit', sys.exit)
 
 
 def handle_input():
@@ -54,7 +54,7 @@ def render():
     main_screen.fill(WINDOW_BG_COLOR)
 
     grid.render(screen)
-    button.render(main_screen)
+    button.render(screen)
 
     pygame.display.flip()
 

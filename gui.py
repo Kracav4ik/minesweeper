@@ -5,15 +5,25 @@ import pygame
 
 
 class Button:
-    def __init__(self, x, y, width, height, click_function):
+    """Кнопка
+    x, y - левый верхний угол кнопки в пикселях
+    width, height - ширена и высота кнопки
+    text - текст
+    click - функция, которая зовётся при клике на кнопку
+    font - шрифт
+    """
+    def __init__(self, x, y, width, height, text, click_function):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
+        self.text = text
         self.click = click_function
+        self.font = pygame.font.SysFont('Arial', 30)
 
-    def render(self, surface):
-        pygame.draw.rect(surface, [0, 0, 255], [self.x, self.y, self.width, self.height])
+    def render(self, screen):
+        screen.draw_rect([0, 0, 255], self.x, self.y, self.width, self.height)
+        screen.draw_text(self.text, self.font, (255, 170, 170), self.x, self.y, self.width, self.height)
 
     def is_inside(self, pos):
         """Возвращает True, если точка pos находится внутри
