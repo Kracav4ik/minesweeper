@@ -28,17 +28,23 @@ class Grid:
     height - Кол-во ячеек по вертикали
     pix_w - Кол-во пикселей одной ячейки по горизантали
     pix_h - Кол-во пикселей одной ячейки по вертикали
+    screen_x, screen_y - Координаты левого верхнего угла игрового поля на экране в пикселах
+    screen_width - Ширина игрового поля в пикселах
+    screen_height - Высота игрового поля в пикселах
     cells - 2-мерная матрица с ячейками; ячейка с координатоми x, y получается как self.cells[x][y]
     active_cell - Коор-ты активной ячейки т.е. коор-ты ячейки где находится курсор мыши
     font - Шрифт цифр внутри клетки
     flag_font - Шрифт флажка внутри клетки
     """
-    def __init__(self, width, height, screen_size):
+    def __init__(self, width, height, screen_x, screen_y, screen_width, screen_height):
         self.width = width
         self.height = height
-        screen_w, screen_h = screen_size
-        self.pix_w = screen_w // width
-        self.pix_h = screen_h // height
+        self.screen_x = screen_x
+        self.screen_y = screen_y
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        self.pix_w = screen_width // width
+        self.pix_h = screen_height // height
         self.cells = []
         self.active_cell = (0, 0)
 
@@ -122,6 +128,9 @@ class Grid:
                 else:
                     color = EMPTY_COLOR
 
+                # Переход из локальных коор-т в коор-ты экрана
+                pix_x, pix_y = self.convert_to_global(pix_x, pix_y)
+
                 # Рисуем клетку нужнем цветом
                 screen.draw_rect(color, pix_x, pix_y, self.pix_w - 2, self.pix_h - 2)
 
@@ -139,7 +148,24 @@ class Grid:
         x, y = self.active_cell
         pix_x = x * self.pix_w
         pix_y = y * self.pix_h
+        # Переход из локальных коор-т в коор-ты экрана
+        pix_x, pix_y = self.convert_to_global(pix_x, pix_y)
         screen.draw_frame(HOVER_COLOR, pix_x, pix_y, self.pix_w, self.pix_h, 3)
+
+    def convert_to_local(self, pos):
+        """Получаем на вход пиксельные коор-ты относительно окна,
+        возвращаем пиксельные коор-ты относительно игрового поля
+        pos - координаты, список из двух чисел
+        """
+        x, y = pos
+        return [x - self.screen_x, y - self.screen_y]
+
+    def convert_to_global(self, pix_x, pix_y):
+        """Получаем на вход пиксельные коор-ты относительно игрового поля,
+        возвращаем пиксельные коор-ты относительно окна
+        pix_x, pix_y - координаты
+        """
+        return [(self.screen_x + pix_x), (self.screen_y + pix_y)]
 
     def cell_click(self, pos):
         """Открывает клетку по которой нажали левой кнопкой мыши

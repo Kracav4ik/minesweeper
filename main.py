@@ -17,7 +17,7 @@ WINDOW_BG_COLOR = (128, 255, 255)  # цвет окна
 
 window_surface = pygame.display.set_mode(WINDOW_SIZE)
 screen = Screen(window_surface)
-grid = Grid(20, 10, screen.get_size())
+grid = Grid(20, 10, 40, 90, 1200, 600)
 
 button = Button(10, 5, 200, 50, sys.exit)
 
@@ -33,13 +33,13 @@ def handle_input():
             if button.is_inside(event.pos):
                 button.click()
             else:
-                pos = screen.convert_to_local(event.pos)
+                pos = grid.convert_to_local(event.pos)
                 if event.button == 1:  # left mouse button
                     grid.cell_click(pos)
                 else:
                     grid.mark_cell(pos)
         elif event.type == pygame.MOUSEMOTION:
-            pos = screen.convert_to_local(event.pos)
+            pos = grid.convert_to_local(event.pos)
             grid.cell_hover(pos)
 
 
