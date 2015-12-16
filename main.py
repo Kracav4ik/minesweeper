@@ -55,6 +55,8 @@ def handle_input():
                 else:
                     grid.mark_cell(pos)
         elif event.type == pygame.MOUSEMOTION:
+            for button in buttons:
+                button.on_mouse_move(event.pos)
             pos = grid.convert_to_local(event.pos)
             grid.cell_hover(pos)
 
