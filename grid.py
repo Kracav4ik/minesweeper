@@ -122,17 +122,19 @@ class Grid:
                 cell = self.cells[x][y]
                 pix_x = x * self.pix_w + 1
                 pix_y = y * self.pix_h + 1
-
-                # Выбираем цвет клетки
-                if not cell.is_open:
-                    screen.draw_texture(self.unknown_cell_texture, pix_x, pix_y, self.pix_w - 2, self.pix_h - 2)
-                elif cell.is_bomb:
-                    screen.draw_texture(self.bomb_cell_texture, pix_x, pix_y, self.pix_w - 2, self.pix_h - 2) 
-                else:
-                    screen.draw_texture(self.empty_cell_texture, pix_x, pix_y, self.pix_w - 2, self.pix_h - 2)
-
+                
                 # Переход из локальных коор-т в коор-ты экрана
                 pix_x, pix_y = self.convert_to_global(pix_x, pix_y)
+                                
+                # Рисуем клетку нужной текстурой
+                if not cell.is_open:
+                    screen.draw_texture(self.unknown_cell_texture, pix_x, pix_y, self.pix_w, self.pix_h)
+                elif cell.is_bomb:
+                    screen.draw_texture(self.bomb_cell_texture, pix_x, pix_y, self.pix_w, self.pix_h) 
+                else:
+                    screen.draw_texture(self.empty_cell_texture, pix_x, pix_y, self.pix_w, self.pix_h)
+
+
 
 
                 # Смотрим кол-во бомб и рисуем цифру кол-во бомб поверх клетки
