@@ -5,9 +5,7 @@ import os.path
 import random
 import pygame
 
-BOMB_COLOR = (192, 0, 0)  # Цвет открытой клетки с бомбой
-EMPTY_COLOR = (0, 192, 0)  # Цвет открытой клетки без бомбы
-UNKNOWN_COLOR = (130, 60, 130)  # Цвет закрытой клетки
+
 HOVER_COLOR = (255, 255, 255)  # Цвет рамки
 BOMB_COUNT = 30  # Кол-во бомб
 
@@ -65,6 +63,10 @@ class Grid:
 
         self.font = pygame.font.SysFont('Arial', 70)
         self.flag_texture = pygame.image.load(os.path.join('data', 'flag.png'))
+        self.bomb_cell_texture = pygame.image.load(os.path.join('data', 'bomb_cell.png'))
+        self.empty_cell_texture = pygame.image.load(os.path.join('data', 'empty_cell.png'))
+        self.unknown_cell_texture = pygame.image.load(os.path.join('data', 'unknown_cell.png'))
+
 
     def good_coords(self, x, y):
         """Возвращает True, если коор-ты х, у которые пренадлежат ячейкам
@@ -123,17 +125,15 @@ class Grid:
 
                 # Выбираем цвет клетки
                 if not cell.is_open:
-                    color = UNKNOWN_COLOR
+                    screen.draw_texture(self.unknown_cell_texture, pix_x, pix_y, self.pix_w - 2, self.pix_h - 2)
                 elif cell.is_bomb:
-                    color = BOMB_COLOR
+                    screen.draw_texture(self.bomb_cell_texture, pix_x, pix_y, self.pix_w - 2, self.pix_h - 2) 
                 else:
-                    color = EMPTY_COLOR
+                    screen.draw_texture(self.empty_cell_texture, pix_x, pix_y, self.pix_w - 2, self.pix_h - 2)
 
                 # Переход из локальных коор-т в коор-ты экрана
                 pix_x, pix_y = self.convert_to_global(pix_x, pix_y)
 
-                # Рисуем клетку нужнем цветом
-                screen.draw_rect(color, pix_x, pix_y, self.pix_w - 2, self.pix_h - 2)
 
                 # Смотрим кол-во бомб и рисуем цифру кол-во бомб поверх клетки
                 if cell.is_open and not cell.is_bomb:
