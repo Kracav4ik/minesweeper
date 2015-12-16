@@ -126,16 +126,15 @@ class Grid:
                 # Переход из локальных коор-т в коор-ты экрана
                 pix_x, pix_y = self.convert_to_global(pix_x, pix_y)
                                 
-                # Рисуем клетку нужной текстурой
                 if not cell.is_open:
-                    screen.draw_texture(self.unknown_cell_texture, pix_x, pix_y, self.pix_w, self.pix_h)
+                    texture = self.unknown_cell_texture
                 elif cell.is_bomb:
-                    screen.draw_texture(self.bomb_cell_texture, pix_x, pix_y, self.pix_w, self.pix_h) 
+                    texture = self.bomb_cell_texture
                 else:
-                    screen.draw_texture(self.empty_cell_texture, pix_x, pix_y, self.pix_w, self.pix_h)
+                    texture = self.empty_cell_texture
 
-
-
+                # Рисуем клетку нужной текстурой
+                screen.draw_texture(texture, pix_x, pix_y, self.pix_w, self.pix_h)
 
                 # Смотрим кол-во бомб и рисуем цифру кол-во бомб поверх клетки
                 if cell.is_open and not cell.is_bomb:
