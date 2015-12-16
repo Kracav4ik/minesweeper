@@ -25,7 +25,16 @@ def create_grid():
 
 create_grid()
 
-button = Button(10, 5, 200, 50, 'New game', create_grid)
+new_game_button = Button(10, 5, 200, 50, 'New game', create_grid)
+exit_button = Button(220, 5, 200, 50, 'Exit!', sys.exit)
+
+buttons = [new_game_button, exit_button]
+
+
+def get_button(pos):
+    for button in buttons:
+        if button.is_inside(pos):
+            return button
 
 
 def handle_input():
@@ -36,7 +45,8 @@ def handle_input():
         if event.type == pygame.QUIT:
             sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if button.is_inside(event.pos):
+            button = get_button(event.pos)
+            if button is not None:
                 button.click()
             else:
                 pos = grid.convert_to_local(event.pos)
@@ -60,7 +70,8 @@ def render():
     main_screen.fill(WINDOW_BG_COLOR)
 
     grid.render(screen)
-    button.render(screen)
+    for button in buttons:
+        button.render(screen)
 
     pygame.display.flip()
 
