@@ -47,26 +47,30 @@ class Grid:
         self.cells = []
         self.active_cell = (0, 0)
 
-        # Генератор случайных бомб в пустых клеточках
-        # Изначально все клеточки без бомб, в список coords записываем все коор-ты всех клеточек
-        coords = []
-        for x in range(width):
-            col = []
-            for y in range(height):
-                col.append(Cell())
-                coords.append([x, y])
-            self.cells.append(col)
-        # Случайно выбираем BOMB_COUNT коор-т и ставим в них бомбу
-        for x, y in random.sample(coords, BOMB_COUNT):
-            cell = self.cells[x][y]
-            cell.is_bomb = True
-
         self.font = pygame.font.SysFont('Arial', 70)
         self.flag_texture = pygame.image.load(os.path.join('data', 'flag.png'))
         self.bomb_cell_texture = pygame.image.load(os.path.join('data', 'bomb_cell.png'))
         self.empty_cell_texture = pygame.image.load(os.path.join('data', 'empty_cell.png'))
         self.unknown_cell_texture = pygame.image.load(os.path.join('data', 'unknown_cell.png'))
 
+    def fill_cells(self, x0, y0):
+        """Генератор случайных бомб в пустых клеточках
+        Изначально все клеточки без бомб, в список coords записываем все коор-ты всех клеточек
+        """
+
+        coords = []
+        for x in range(self.width):
+            col = []
+            for y in range(self.height):
+                col.append(Cell())
+                if x0 == x and y0 == y:
+                    continue
+                coords.append([x, y])
+            self.cells.append(col)
+        # Случайно выбираем BOMB_COUNT коор-т и ставим в них бомбу
+        for x, y in random.sample(coords, BOMB_COUNT):
+            cell = self.cells[x][y]
+            cell.is_bomb = True
 
     def good_coords(self, x, y):
         """Возвращает True, если коор-ты х, у которые пренадлежат ячейкам
@@ -119,16 +123,25 @@ class Grid:
         # Рисуем ячейки
         for x in range(self.width):
             for y in range(self.height):
-                cell = self.cells[x][y]
+                if self.cells:
+                    cell = self.cells[x][y]
+                    is_open = cell.is_open
+                    is_bomb = cell.is_bomb
+                    is_marked = cell.is_marked
+                else:
+                    is_open = False
+                    is_bomb = False
+                    is_marked = False
+
                 pix_x = x * self.pix_w + 1
                 pix_y = y * self.pix_h + 1
                 
                 # Переход из локальных коор-т в коор-ты экрана
                 pix_x, pix_y = self.convert_to_global(pix_x, pix_y)
-                                
-                if not cell.is_open:
+
+                if not is_open:
                     texture = self.unknown_cell_texture
-                elif cell.is_bomb:
+                elif is_bomb:
                     texture = self.bomb_cell_texture
                 else:
                     texture = self.empty_cell_texture
@@ -137,13 +150,13 @@ class Grid:
                 screen.draw_texture(texture, pix_x, pix_y, self.pix_w, self.pix_h)
 
                 # Смотрим кол-во бомб и рисуем цифру кол-во бомб поверх клетки
-                if cell.is_open and not cell.is_bomb:
+                if is_open and not is_bomb:
                     bombs_count = self.bombs_count(x, y)
                     if bombs_count > 0:
                         screen.draw_text(str(bombs_count), self.font, (0, 0, 0), pix_x, pix_y, self.pix_w - 2, self.pix_h - 2)
 
                 # Рисуем флажок поверх помеченой клетке
-                if cell.is_marked:
+                if is_marked:
                     screen.draw_texture(self.flag_texture, pix_x, pix_y, self.pix_w - 2, self.pix_h - 2)
 
         # Рисуем рамку поверх активной ячейки
@@ -173,6 +186,8 @@ class Grid:
         """Открывает клетку по которой нажали левой кнопкой мыши
         """
         x, y = self.pixels_to_grid(pos)
+        if not self.cells:
+            self.fill_cells(x, y)
         if not self.good_coords(x, y):
             return
         self.open_cell(x, y)
