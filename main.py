@@ -25,10 +25,25 @@ def create_grid():
 
 create_grid()
 
+
+def save_grid():
+    global grid
+    f = open('save_data', 'w')
+    grid.save(f)
+    f.close()
+
+
+def load_grid():
+    global grid
+    print 'load me!'
+
+
+save_game_button = Button(640, 5, 200, 50, 'Save game', save_grid)
+load_game_button = Button(430, 5, 200, 50, 'Load game', load_grid)
 new_game_button = Button(10, 5, 200, 50, 'New game', create_grid)
 exit_button = Button(220, 5, 200, 50, 'Exit!', sys.exit)
 
-buttons = [new_game_button, exit_button]
+buttons = [new_game_button, exit_button, load_game_button, save_game_button]
 
 
 def get_button(pos):

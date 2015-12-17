@@ -53,6 +53,15 @@ class Grid:
         self.empty_cell_texture = pygame.image.load(os.path.join('data', 'empty_cell.png'))
         self.unknown_cell_texture = pygame.image.load(os.path.join('data', 'unknown_cell.png'))
 
+    def save(self, f):
+        f.write('%s x %s\n\n' % (self.width, self.height))
+        for y in range(self.height):
+            for x in range(self.width):
+                cell = self.cells[x][y]
+                f.write('[%s %s %s]' % (cell.is_open, cell.is_bomb, cell.is_marked))
+                f.write(', ')
+            f.write('\n')
+
     def fill_cells(self, x0, y0):
         """Генератор случайных бомб в пустых клеточках
         Изначально все клеточки без бомб, в список coords записываем все коор-ты всех клеточек
