@@ -8,8 +8,10 @@ import pygame
 
 HOVER_COLOR = (255, 255, 255)  # Цвет рамки
 BOMB_COUNT = 30  # Кол-во бомб
+SEPARATOR = ' x '
 
 
+# noinspection PyClassHasNoInit
 class Cell:
     """Клетка игрового поля,
     is_open -  Открыта ли клетка,
@@ -53,13 +55,43 @@ class Grid:
         self.empty_cell_texture = pygame.image.load(os.path.join('data', 'empty_cell.png'))
         self.unknown_cell_texture = pygame.image.load(os.path.join('data', 'unknown_cell.png'))
 
+    def load(self, f):
+        lines = f.readlines()
+        header = lines[0]
+        index = header.find(SEPARATOR)
+        w = header[:index]
+        h = header[index + len(SEPARATOR):-1]
+        self.width = int(w)
+        self.height = int(h)
+
+        self.cells = []
+        for x in range(self.width):
+            col = []
+            for y in range(self.height):
+                col.append(Cell())
+            self.cells.append(col)
+
+        lines = lines[2:]
+        for y in range(self.height):
+            row = lines[y]
+            elements = row.split(', ')
+            for x in range(self.width):
+                element = elements[x]
+                cell = self.cells[x][y]
+                cell.is_bomb = 'b' in element
+                cell.is_open = 'o' in element
+                cell.is_marked = 'm' in element
+
     def save(self, f):
-        f.write('%s x %s\n\n' % (self.width, self.height))
+        f.write('%s%s%s\n\n' % (self.width, SEPARATOR, self.height))
         for y in range(self.height):
             for x in range(self.width):
                 cell = self.cells[x][y]
-                f.write('[%s %s %s]' % (cell.is_open, cell.is_bomb, cell.is_marked))
-                f.write(', ')
+                f.write('b' if cell.is_bomb else ' ')
+                f.write('o' if cell.is_open else ' ')
+                f.write('m' if cell.is_marked else ' ')
+                if x < self.width - 1:
+                    f.write(', ')
             f.write('\n')
 
     def fill_cells(self, x0, y0):

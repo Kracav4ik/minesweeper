@@ -4,12 +4,14 @@ from __future__ import division
 
 import pygame
 import sys
+import os.path
 
 from grid import Grid
 from gui import Button
 from screen import Screen
 
 # инициализация
+SAVE_FILE = 'save_data'
 pygame.init()
 
 WINDOW_SIZE = (1280, 720)  # размер окна в пикселах
@@ -28,14 +30,17 @@ create_grid()
 
 def save_grid():
     global grid
-    f = open('save_data', 'w')
+    f = open(SAVE_FILE, 'w')
     grid.save(f)
     f.close()
 
 
 def load_grid():
     global grid
-    print 'load me!'
+    if os.path.exists(SAVE_FILE):
+        f = open(SAVE_FILE, 'r')
+        grid.load(f)
+        f.close()
 
 
 save_game_button = Button(640, 5, 200, 50, 'Save game', save_grid)
