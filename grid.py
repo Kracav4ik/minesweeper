@@ -48,7 +48,9 @@ class Grid:
         self.pix_h = screen_height // height
         self.cells = []
         self.active_cell = (0, 0)
+        self.game_over = False
 
+        # Рисовалка
         self.font = pygame.font.SysFont('Arial', 70)
         self.flag_texture = pygame.image.load(os.path.join('data', 'flag.png'))
         self.bomb_cell_texture = pygame.image.load(os.path.join('data', 'bomb_cell.png'))
@@ -72,6 +74,7 @@ class Grid:
             self.cells.append(col)
 
         lines = lines[2:]
+        self.game_over = False
         for y in range(self.height):
             row = lines[y]
             elements = row.split(', ')
@@ -81,6 +84,8 @@ class Grid:
                 cell.is_bomb = 'b' in element
                 cell.is_open = 'o' in element
                 cell.is_marked = 'm' in element
+                if cell.is_open and cell.is_bomb:
+                    self.game_over = True
 
     def save(self, f):
         f.write('%s%s%s\n\n' % (self.width, SEPARATOR, self.height))
@@ -226,6 +231,8 @@ class Grid:
     def cell_click(self, pos):
         """Открывает клетку по которой нажали левой кнопкой мыши
         """
+        if self.game_over:
+            return
         x, y = self.pixels_to_grid(pos)
         if not self.cells:
             self.fill_cells(x, y)
@@ -241,8 +248,19 @@ class Grid:
         if cell.is_marked:
             return
         cell.is_open = True
+        if cell.is_bomb:
+            # Открыть все ячейки с бомбами
+            self.open_bombs()
+            self.game_over = True
         if not cell.is_bomb and self.bombs_count(x, y) == 0:
             self.open_neighbors(x, y)
+
+    def open_bombs(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                cell = self.cells[x][y]
+                if cell.is_bomb:
+                    cell.is_open = True
 
     def open_neighbors(self, x, y):
         """ Открыть все соседние клетки
@@ -264,6 +282,8 @@ class Grid:
         """Ставит / снимает флажок на закрытые клетки,
         для открытых клеток открывает соседние если кол-во флажков соот-ет кол-ву бомб рядом с клеткой
         """
+        if self.game_over:
+            return
         x, y = self.pixels_to_grid(pos)
         if not self.good_coords(x, y):
             return
