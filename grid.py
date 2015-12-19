@@ -57,6 +57,15 @@ class Grid:
         self.empty_cell_texture = pygame.image.load(os.path.join('data', 'empty_cell.png'))
         self.unknown_cell_texture = pygame.image.load(os.path.join('data', 'unknown_cell.png'))
 
+    def free_cells_count(self):
+        free_cells = 0
+        for x in range(self.width):
+            for y in range(self.height):
+                cell = self.cells[x][y]
+                if cell.is_open:
+                    free_cells += 1
+        return free_cells
+
     def load(self, f):
         lines = f.readlines()
         header = lines[0]
@@ -86,6 +95,11 @@ class Grid:
                 cell.is_marked = 'm' in element
                 if cell.is_open and cell.is_bomb:
                     self.game_over = True
+        self.check_win()
+
+    def check_win(self):
+        if self.free_cells_count() == self.height * self.width - BOMB_COUNT:
+            self.game_over = True
 
     def save(self, f):
         f.write('%s%s%s\n\n' % (self.width, SEPARATOR, self.height))
@@ -254,6 +268,7 @@ class Grid:
             self.game_over = True
         if not cell.is_bomb and self.bombs_count(x, y) == 0:
             self.open_neighbors(x, y)
+        self.check_win()
 
     def open_bombs(self):
         for y in range(self.height):
@@ -287,6 +302,8 @@ class Grid:
         x, y = self.pixels_to_grid(pos)
         if not self.good_coords(x, y):
             return
+        if not self.cells:
+            self.fill_cells(x, y)
         cell = self.cells[x][y]
         if cell.is_open:
             if not cell.is_bomb and self.bombs_count(x, y) == self.flags_count(x, y):
