@@ -2,3 +2,5 @@ Thumbs.db
 ehthumbs.db
 *.pyc
 save_data
+build
+dist
