@@ -4,3 +4,4 @@ ehthumbs.db
 save_data
 build
 dist
+*.spec
